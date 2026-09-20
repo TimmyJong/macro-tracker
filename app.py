@@ -43,10 +43,20 @@ INITIAL_DATA = [
 ]
 
 def load_data():
-    if not os.path.exists(CSV_FILE):
+    # If file doesn't exist OR if it is completely empty, initialize with default data
+    if not os.path.exists(CSV_FILE) or os.path.getsize(CSV_FILE) == 0:
         df = pd.DataFrame(INITIAL_DATA)
         df.to_csv(CSV_FILE, index=False)
+        return df
+
     df = pd.read_csv(CSV_FILE)
+
+    # If the file exists but has 0 data rows, populate it with INITIAL_DATA
+    if df.empty:
+        df = pd.DataFrame(INITIAL_DATA)
+        df.to_csv(CSV_FILE, index=False)
+        return df
+
     if "Photo" not in df.columns:
         df["Photo"] = None
     return df
