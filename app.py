@@ -12,45 +12,63 @@ st.set_page_config(page_title="Macro Tracker Hub", layout="wide")
 
 CSV_FILE = "macro_history.csv"
 
-# Function to compress image and turn into a base64 string for persistent CSV storage
-def image_to_base64(img):
+# Function to compress image into a base64 data-URI thumbnail
+def image_to_base64_uri(img):
     img_copy = img.copy()
-    img_copy.thumbnail((400, 400)) # Compress to thumbnail size
+    img_copy.thumbnail((300, 300))
     buffered = BytesIO()
     img_copy.save(buffered, format="JPEG", quality=75)
-    return base64.b64encode(buffered.getvalue()).decode()
+    b64 = base64.b64encode(buffered.getvalue()).decode()
+    return f"data:image/jpeg;base64,{b64}"
+
+# Default historical table items
+INITIAL_DATA = [
+    {"Photo": None, "Category": "Home Staples", "Item Name": "Boiled Rice Vermicelli (Bún)", "Portion": "100g cooked", "Calories": 120, "Protein": 2.0, "Fat": 0.4, "Carbs": 26.5},
+    {"Photo": None, "Category": "Home Staples", "Item Name": "Pork Hock (Giò Heo)", "Portion": "Plate (240g edible)", "Calories": 600, "Protein": 51.5, "Fat": 44.0, "Carbs": 0.0},
+    {"Photo": None, "Category": "Home Staples", "Item Name": "Grass-Fed Eye Fillet", "Portion": "100g cooked", "Calories": 178, "Protein": 30.0, "Fat": 6.0, "Carbs": 0.0},
+    {"Photo": None, "Category": "Home Staples", "Item Name": "Coles Slow Cook Pork Scotch", "Portion": "100g cooked", "Calories": 243, "Protein": 29.0, "Fat": 14.0, "Carbs": 0.0},
+    {"Photo": None, "Category": "Home Staples", "Item Name": "MC Yee Thin Egg Noodles", "Portion": "Bowl (~200g)", "Calories": 360, "Protein": 18.0, "Fat": 3.2, "Carbs": 64.0},
+    {"Photo": None, "Category": "Home Staples", "Item Name": "Pork & Prawn Wontons", "Portion": "Bowl (10 pcs)", "Calories": 420, "Protein": 24.5, "Fat": 18.0, "Carbs": 39.0},
+    {"Photo": None, "Category": "Home Staples", "Item Name": "Beef Shin / Gravy Beef", "Portion": "100g braised", "Calories": 205, "Protein": 32.5, "Fat": 8.0, "Carbs": 0.0},
+    {"Photo": None, "Category": "Home Staples", "Item Name": "Oakleigh Ranch Wagyu Shin", "Portion": "100g simmered", "Calories": 255, "Protein": 30.0, "Fat": 15.0, "Carbs": 0.0},
+    {"Photo": None, "Category": "Home Staples", "Item Name": "Thick Bún Bò Huế Noodles", "Portion": "Colander (~600g)", "Calories": 740, "Protein": 13.5, "Fat": 2.5, "Carbs": 168.0},
+    {"Photo": None, "Category": "Home Staples", "Item Name": "Bò Kho Beef Chunks", "Portion": "100g cooked meat", "Calories": 223, "Protein": 30.5, "Fat": 11.0, "Carbs": 1.5},
+    {"Photo": None, "Category": "Home Staples", "Item Name": "Bò Kho Broth", "Portion": "1 Cup (~250 mL)", "Calories": 125, "Protein": 5.0, "Fat": 7.0, "Carbs": 9.0},
+    {"Photo": None, "Category": "Snacks & Fruit", "Item Name": "White Guava (Ổi)", "Portion": "Plate (~220g sliced)", "Calories": 150, "Protein": 5.5, "Fat": 2.0, "Carbs": 31.5},
+    {"Photo": None, "Category": "Restaurant", "Item Name": "Piqle Original Beef Sliders", "Portion": "2 Sliders", "Calories": 680, "Protein": 34.0, "Fat": 40.0, "Carbs": 46.0},
+    {"Photo": None, "Category": "Restaurant", "Item Name": "Piqle French Fries", "Portion": "1 Serving", "Calories": 360, "Protein": 4.0, "Fat": 18.0, "Carbs": 45.0},
+    {"Photo": None, "Category": "Restaurant", "Item Name": "Grill'd Caesar's Palace", "Portion": "1 Burger", "Calories": 680, "Protein": 51.0, "Fat": 33.0, "Carbs": 46.0},
+    {"Photo": None, "Category": "Restaurant", "Item Name": "Phở An Beef Combination", "Portion": "Large Bowl", "Calories": 770, "Protein": 57.0, "Fat": 20.0, "Carbs": 92.0},
+    {"Photo": None, "Category": "Restaurant", "Item Name": "Caraway Wagyu Udon & Marrow", "Portion": "Full Bowl + Canoe", "Calories": 1170, "Protein": 43.5, "Fat": 81.0, "Carbs": 73.5},
+]
 
 def load_data():
     if not os.path.exists(CSV_FILE):
-        columns = ["Category", "Item Name", "Portion", "Calories", "Protein", "Fat", "Carbs", "Image_Base64"]
-        df = pd.DataFrame(columns=columns)
+        df = pd.DataFrame(INITIAL_DATA)
         df.to_csv(CSV_FILE, index=False)
     df = pd.read_csv(CSV_FILE)
-    if "Image_Base64" not in df.columns:
-        df["Image_Base64"] = ""
+    if "Photo" not in df.columns:
+        df["Photo"] = None
     return df
 
-def save_entry(entry_dict, b64_img):
+def save_entry(entry_dict, img_uri):
     df = load_data()
-    entry_dict["Image_Base64"] = b64_img
+    entry_dict["Photo"] = img_uri
     new_df = pd.concat([pd.DataFrame([entry_dict]), df], ignore_index=True)
     new_df.to_csv(CSV_FILE, index=False)
 
 st.title("🥗 Macro Tracker Hub")
 
-# Sidebar setup
 with st.sidebar:
     st.header("Settings")
-    # Tries to read from Streamlit Secrets first, falls back to manual entry
     default_key = st.secrets.get("GEMINI_API_KEY", "") if hasattr(st, "secrets") else ""
     api_key = st.text_input("Gemini API Key", value=default_key, type="password")
     
     st.markdown("---")
     current_df = load_data()
-    # Export clean CSV (without heavy image base64 strings) for Google Sheets
-    export_df = current_df.drop(columns=["Image_Base64"], errors="ignore")
+    export_df = current_df.drop(columns=["Photo"], errors="ignore")
     st.download_button(
-        label="📥 Download CSV for Google Sheets",
+        label="📥 Download Clean CSV",
         data=export_df.to_csv(index=False).encode('utf-8'),
         file_name="macro_history.csv",
         mime="text/csv"
@@ -58,13 +76,13 @@ with st.sidebar:
 
 col1, col2 = st.columns([1, 1])
 
-# Column 1: Upload and Analyze
+# Photo Upload & Analysis
 with col1:
-    st.subheader("📷 Upload Food Photo")
-    uploaded_file = st.file_uploader("Snap or upload meal", type=["jpg", "jpeg", "png"])
-    user_notes = st.text_input("Extra details (optional)", placeholder="e.g. 200g raw wagyu, no sugar in dressing")
+    st.subheader("📷 Log Meal Photo")
+    uploaded_file = st.file_uploader("Upload meal image", type=["jpg", "jpeg", "png"])
+    user_notes = st.text_input("Extra details (optional)", placeholder="e.g. Marinated Wagyu cooked, ~280g")
 
-    if uploaded_file and st.button("⚡ Analyze & Save Entry"):
+    if uploaded_file and st.button("⚡ Analyze & Add to Table"):
         if not api_key:
             st.error("Please add your Gemini API Key in the sidebar or Secrets.")
         else:
@@ -105,39 +123,50 @@ with col1:
                     )
 
                     result = json.loads(response.text)
-                    b64_str = image_to_base64(img)
-                    save_entry(result, b64_str)
-                    st.success(f"Saved {result['Item Name']} with photo!")
+                    uri = image_to_base64_uri(img)
+                    save_entry(result, uri)
+                    st.success(f"Added {result['Item Name']} to your table!")
                     st.rerun()
 
                 except Exception as e:
                     st.error(f"Error during analysis: {e}")
 
-# Column 2: Dashboard (Table & Photo Gallery)
+# Master Table with Inline Images
 with col2:
-    tab1, tab2 = st.tabs(["📊 Master Table", "🖼️ Photo Gallery"])
-    
+    tab1, tab2 = st.tabs(["📊 Master Table", "🖼️ Photo Feed"])
     df = load_data()
     
     with tab1:
-        # Show clean text table
-        table_view = df.drop(columns=["Image_Base64"], errors="ignore")
-        st.dataframe(table_view, use_container_width=True, height=550)
+        st.dataframe(
+            df,
+            column_config={
+                "Photo": st.column_config.ImageColumn(
+                    "Photo",
+                    help="Meal photo thumbnail (double-click to zoom)",
+                    width="small"
+                ),
+                "Calories": st.column_config.NumberColumn("Calories (kcal)", format="%d"),
+                "Protein": st.column_config.NumberColumn("Protein (g)", format="%.1f"),
+                "Fat": st.column_config.NumberColumn("Fat (g)", format="%.1f"),
+                "Carbs": st.column_config.NumberColumn("Carbs (g)", format="%.1f"),
+            },
+            column_order=["Photo", "Category", "Item Name", "Portion", "Calories", "Protein", "Fat", "Carbs"],
+            use_container_width=True,
+            height=600,
+            hide_index=True
+        )
 
     with tab2:
-        # Visual feed showing photos paired with macro cards
-        if df.empty:
-            st.info("No meals logged yet.")
+        feed_df = df[df["Photo"].notna() & (df["Photo"] != "")]
+        if feed_df.empty:
+            st.info("No meals with photos uploaded yet.")
         else:
-            for _, row in df.iterrows():
+            for _, row in feed_df.iterrows():
                 with st.container():
-                    c_img, c_info = st.columns([1, 2])
-                    with c_img:
-                        if pd.notna(row.get("Image_Base64")) and row["Image_Base64"]:
-                            st.image(f"data:image/jpeg;base64,{row['Image_Base64']}", use_column_width=True)
-                        else:
-                            st.caption("No photo available")
-                    with c_info:
+                    c1, c2 = st.columns([1, 2])
+                    with c1:
+                        st.image(row["Photo"], use_column_width=True)
+                    with c2:
                         st.markdown(f"**{row['Item Name']}** ({row.get('Category', 'Meal')})")
                         st.caption(f"Portion: {row.get('Portion', 'N/A')}")
                         st.markdown(
