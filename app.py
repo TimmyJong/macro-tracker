@@ -21,25 +21,25 @@ def image_to_base64_uri(img):
     b64 = base64.b64encode(buffered.getvalue()).decode()
     return f"data:image/jpeg;base64,{b64}"
 
-# Default historical table items
+# Default historical table items (All standardized per 100g / 100mL)
 INITIAL_DATA = [
     {"Photo": None, "Category": "Home Staples", "Item Name": "Boiled Rice Vermicelli (Bún)", "Portion": "100g cooked", "Calories": 120, "Protein": 2.0, "Fat": 0.4, "Carbs": 26.5},
-    {"Photo": None, "Category": "Home Staples", "Item Name": "Pork Hock (Giò Heo)", "Portion": "Plate (240g edible)", "Calories": 600, "Protein": 51.5, "Fat": 44.0, "Carbs": 0.0},
+    {"Photo": None, "Category": "Home Staples", "Item Name": "Pork Hock (Giò Heo)", "Portion": "100g cooked edible", "Calories": 250, "Protein": 21.5, "Fat": 18.3, "Carbs": 0.0},
     {"Photo": None, "Category": "Home Staples", "Item Name": "Grass-Fed Eye Fillet", "Portion": "100g cooked", "Calories": 178, "Protein": 30.0, "Fat": 6.0, "Carbs": 0.0},
     {"Photo": None, "Category": "Home Staples", "Item Name": "Coles Slow Cook Pork Scotch", "Portion": "100g cooked", "Calories": 243, "Protein": 29.0, "Fat": 14.0, "Carbs": 0.0},
-    {"Photo": None, "Category": "Home Staples", "Item Name": "MC Yee Thin Egg Noodles", "Portion": "Bowl (~200g)", "Calories": 360, "Protein": 18.0, "Fat": 3.2, "Carbs": 64.0},
-    {"Photo": None, "Category": "Home Staples", "Item Name": "Pork & Prawn Wontons", "Portion": "Bowl (10 pcs)", "Calories": 420, "Protein": 24.5, "Fat": 18.0, "Carbs": 39.0},
+    {"Photo": None, "Category": "Home Staples", "Item Name": "MC Yee Thin Egg Noodles", "Portion": "100g cooked", "Calories": 180, "Protein": 9.0, "Fat": 1.6, "Carbs": 32.0},
+    {"Photo": None, "Category": "Home Staples", "Item Name": "Pork & Prawn Wontons", "Portion": "100g cooked (~5 pcs)", "Calories": 200, "Protein": 11.7, "Fat": 8.6, "Carbs": 18.6},
     {"Photo": None, "Category": "Home Staples", "Item Name": "Beef Shin / Gravy Beef", "Portion": "100g braised", "Calories": 205, "Protein": 32.5, "Fat": 8.0, "Carbs": 0.0},
     {"Photo": None, "Category": "Home Staples", "Item Name": "Oakleigh Ranch Wagyu Shin", "Portion": "100g simmered", "Calories": 255, "Protein": 30.0, "Fat": 15.0, "Carbs": 0.0},
-    {"Photo": None, "Category": "Home Staples", "Item Name": "Thick Bún Bò Huế Noodles", "Portion": "Colander (~600g)", "Calories": 740, "Protein": 13.5, "Fat": 2.5, "Carbs": 168.0},
+    {"Photo": None, "Category": "Home Staples", "Item Name": "Thick Bún Bò Huế Noodles", "Portion": "100g cooked", "Calories": 123, "Protein": 2.3, "Fat": 0.4, "Carbs": 28.0},
     {"Photo": None, "Category": "Home Staples", "Item Name": "Bò Kho Beef Chunks", "Portion": "100g cooked meat", "Calories": 223, "Protein": 30.5, "Fat": 11.0, "Carbs": 1.5},
-    {"Photo": None, "Category": "Home Staples", "Item Name": "Bò Kho Broth", "Portion": "1 Cup (~250 mL)", "Calories": 125, "Protein": 5.0, "Fat": 7.0, "Carbs": 9.0},
-    {"Photo": None, "Category": "Snacks & Fruit", "Item Name": "White Guava (Ổi)", "Portion": "Plate (~220g sliced)", "Calories": 150, "Protein": 5.5, "Fat": 2.0, "Carbs": 31.5},
-    {"Photo": None, "Category": "Restaurant", "Item Name": "Piqle Original Beef Sliders", "Portion": "2 Sliders", "Calories": 680, "Protein": 34.0, "Fat": 40.0, "Carbs": 46.0},
-    {"Photo": None, "Category": "Restaurant", "Item Name": "Piqle French Fries", "Portion": "1 Serving", "Calories": 360, "Protein": 4.0, "Fat": 18.0, "Carbs": 45.0},
-    {"Photo": None, "Category": "Restaurant", "Item Name": "Grill'd Caesar's Palace", "Portion": "1 Burger", "Calories": 680, "Protein": 51.0, "Fat": 33.0, "Carbs": 46.0},
-    {"Photo": None, "Category": "Restaurant", "Item Name": "Phở An Beef Combination", "Portion": "Large Bowl", "Calories": 770, "Protein": 57.0, "Fat": 20.0, "Carbs": 92.0},
-    {"Photo": None, "Category": "Restaurant", "Item Name": "Caraway Wagyu Udon & Marrow", "Portion": "Full Bowl + Canoe", "Calories": 1170, "Protein": 43.5, "Fat": 81.0, "Carbs": 73.5},
+    {"Photo": None, "Category": "Home Staples", "Item Name": "Bò Kho Broth", "Portion": "100mL", "Calories": 50, "Protein": 2.0, "Fat": 2.8, "Carbs": 3.6},
+    {"Photo": None, "Category": "Snacks & Fruit", "Item Name": "White Guava (Ổi)", "Portion": "100g raw", "Calories": 68, "Protein": 2.5, "Fat": 0.9, "Carbs": 14.3},
+    {"Photo": None, "Category": "Restaurant", "Item Name": "Piqle Original Beef Sliders", "Portion": "100g", "Calories": 295, "Protein": 14.8, "Fat": 17.4, "Carbs": 20.0},
+    {"Photo": None, "Category": "Restaurant", "Item Name": "Piqle French Fries", "Portion": "100g", "Calories": 277, "Protein": 3.1, "Fat": 13.8, "Carbs": 34.6},
+    {"Photo": None, "Category": "Restaurant", "Item Name": "Grill'd Caesar's Palace", "Portion": "100g", "Calories": 206, "Protein": 15.5, "Fat": 10.0, "Carbs": 13.9},
+    {"Photo": None, "Category": "Restaurant", "Item Name": "Phở An Beef Combination", "Portion": "100g (dish avg)", "Calories": 88, "Protein": 6.5, "Fat": 2.3, "Carbs": 10.5},
+    {"Photo": None, "Category": "Restaurant", "Item Name": "Caraway Wagyu Udon & Marrow", "Portion": "100g (dish avg)", "Calories": 195, "Protein": 7.3, "Fat": 13.5, "Carbs": 12.3},
 ]
 
 def load_data():
